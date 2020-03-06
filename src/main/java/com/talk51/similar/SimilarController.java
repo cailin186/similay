@@ -21,10 +21,22 @@ public class SimilarController {
         int dis = 0;
         try {
             dis = p.distance(new URL(source), new URL(candi));
-            System.out.println(dis);
         } catch (Exception e) {
             e.printStackTrace();
         }
         return dis;
+    }
+
+
+    @GetMapping("/dis")
+    public String getHanMingDis(@RequestParam(value = "url", required = true) String url) {
+        ImagePHash p = new ImagePHash();
+        String hash = "";
+        try {
+            hash =  p.hash(new URL(url));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return hash;
     }
 }
