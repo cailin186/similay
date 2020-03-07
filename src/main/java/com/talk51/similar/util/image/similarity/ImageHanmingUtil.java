@@ -10,17 +10,21 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.net.URL;
 
-public class ImagePHash {
+/**
+ * 求图像的汉明距离，通过汉明距离进行相似度的计算
+ * @author cailin
+ */
+public class ImageHanmingUtil {
 
     private int size = 32;
     private int smallerSize = 8;
     private double[] c;
 
-    public ImagePHash() {
+    public ImageHanmingUtil() {
         initCoefficients();
     }
 
-    public ImagePHash(int size, int smallerSize) {
+    public ImageHanmingUtil(int size, int smallerSize) {
         this.size = size;
         this.smallerSize = smallerSize;
         initCoefficients();
@@ -45,8 +49,13 @@ public class ImagePHash {
         return counter;
     }
 
-    // Returns a 'binary string' (like. 001010111011100010) which is easy to do
-    // a hamming distance on.
+    /**
+     * Returns a 'binary string' (like. 001010111011100010) which is easy to do
+     * a hamming distance on.
+     * @param is
+     * @return
+     * @throws Exception
+     */
     private String getHash(InputStream is) throws Exception {
         BufferedImage img = ImageIO.read(is);
 
@@ -123,6 +132,14 @@ public class ImagePHash {
         return hash;
     }
 
+
+    /**
+     * 简化DCT的计算，缩小图像的尺寸
+     * @param image 图片流
+     * @param width 图片宽
+     * @param height 图片高
+     * @return
+     */
     private BufferedImage resize(BufferedImage image, int width, int height) {
         BufferedImage resizedImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g = resizedImage.createGraphics();
@@ -163,11 +180,11 @@ public class ImagePHash {
     }
 
     /**
-     * @param srcUrl
-     * @param canUrl
+     * 根据图片的url获取两张图片的汉明距离
+     * @param srcUrl 包含http协议头的图片url
+     * @param canUrl 包含http协议头的图片url
      * @return 值越小相识度越高，10之内可以简单判断这两张图片内容一致
      * @throws Exception
-     * @throws
      */
     public int distance(URL srcUrl, URL canUrl) throws Exception {
         String imgStr = this.getHash(srcUrl.openStream());
@@ -176,6 +193,7 @@ public class ImagePHash {
     }
 
     /**
+     * 获得两张图片的汉明距离
      * @param srcFile
      * @param canFile
      * @return 值越小相识度越高，10之内可以简单判断这两张图片内容一致
@@ -188,7 +206,7 @@ public class ImagePHash {
     }
 
     /**
-     * 获取汉明二进制码
+     * 获取单个图片的二进制汉明码
      * @param srcUrl
      * @return 二进制
      */
@@ -196,4 +214,24 @@ public class ImagePHash {
         return this.getHash(srcUrl.openStream());
     }
 
+    /**
+     * 根据传来的url判断图片是否是合法的
+     * @param srcURL
+     * @return 返回一个整形的数字，若为0说明图片不合法
+     */
+    public int checkImageValid(String srcURL){
+
+        int distence=0;
+        String[] unValidImage={
+                "http://img.51talk.com/ac/upload/face_pic/1/70/170b0f57dc71a586.png",
+                "http://img.51talk.com/ac/upload/face_pic/1/70/170b08a27be8be77.png"
+        };
+        for (String i:unValidImage){
+           distence = this.distance(srcURL,i);
+           if(distence==0){
+               break;
+           }
+        }
+        return distence;
+    }
 }
